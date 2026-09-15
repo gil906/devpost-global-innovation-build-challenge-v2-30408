@@ -1,0 +1,15 @@
+.env
+.env.*
+!.env.example
+node_modules/
+__pycache__/
+*.pyc
+.venv/
+.devpost-workspace
+.build-runtime/
+.runtime/
+MANUAL_TODO.md
+HUMAN_STEPS.json
+BUILD_REPORT.json
+PROJECT_META.json
+DEPLOYMENT.json

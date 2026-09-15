@@ -1,0 +1,143 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#124f41">
+  <meta name="description" content="An explainable, local-first planning lab for community food-surplus transfers.">
+  <title>CommonTable | Food rescue, thoughtfully planned</title>
+  <link rel="icon" href="/icon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/style.css">
+  <script type="module" src="/app.js"></script>
+</head>
+<body>
+  <header class="site-header">
+    <a class="brand" href="/" aria-label="CommonTable home"><img src="/icon.svg" alt="" width="38" height="38"><span>Common<span class="brand-light">Table</span></span></a>
+    <span class="header-note">Small distances. Shared abundance.</span>
+    <span class="pill"><span class="status-dot"></span> Local-first planning lab</span>
+  </header>
+  <main>
+    <section class="hero">
+      <div>
+        <p class="eyebrow">COMMUNITY INFRASTRUCTURE / OPEN TRACK</p>
+        <h1>Good food.<br><span>Better connections.</span></h1>
+        <p class="hero-description">Turn surplus into a thoughtful transfer plan. Match food with community hubs, respect the constraints, and see what a simple first-come approach misses.</p>
+      </div>
+      <aside class="hero-card">
+        <span class="small-label">THE IDEA, IN ONE LINE</span>
+        <p>More at the table.<br>Less left behind.</p>
+        <div class="hero-card-bottom"><span>Supply</span><span class="connection-line"></span><span>Community</span></div>
+      </aside>
+    </section>
+
+    <div class="workspace-bar">
+      <div><span class="small-label">YOUR SCENARIO</span><h2 id="scenario-title">Loading the planning lab...</h2></div>
+      <div class="actions">
+        <button id="load-demo" class="button subtle" type="button">Reset sample</button>
+        <button id="import-button" class="button secondary" type="button">Import JSON</button>
+        <input id="import-file" type="file" accept=".json,application/json" hidden>
+        <button id="saved-button" class="button secondary" type="button">Snapshots <span id="saved-count">0</span></button>
+        <button id="save-button" class="button primary" type="button">Save snapshot</button>
+      </div>
+    </div>
+    <div class="notice"><span class="notice-icon" aria-hidden="true">i</span><span><strong>Simulation, not dispatch.</strong> Fictional locations and synthetic servings. Direct distances, parallel loads, and declared cold storage are planning assumptions, not a food-safety guarantee.</span></div>
+    <div id="message" class="message" role="status" aria-live="polite" hidden></div>
+    <div id="error" class="message error" role="alert" hidden></div>
+
+    <div class="layout">
+      <aside class="settings-panel panel">
+        <div class="panel-heading"><h2>Plan parameters</h2><span class="small-tag">WHAT IF?</span></div>
+        <form id="settings-form">
+          <label for="scenario-name">Scenario name</label>
+          <input id="scenario-name" name="name" maxlength="80" required>
+          <div class="field-row">
+            <div><label for="start-time">Start time</label><input id="start-time" name="start_minute" type="time" required></div>
+            <div><label for="speed">Speed (km/h)</label><input id="speed" name="speed_kph" type="number" min="1" max="100" step="any" required></div>
+          </div>
+          <label for="max-distance">Maximum leg <span id="distance-value" class="value-label">5.5 km</span></label>
+          <input id="max-distance" name="max_leg_km" type="range" min="0.5" max="20" step="0.5" value="5.5">
+          <div class="range-labels"><span>0.5 km</span><span>20 km</span></div>
+          <label for="handling">Handling per load (minutes)</label>
+          <input id="handling" name="handling_minutes" type="number" min="0" max="120" step="1" required>
+          <label for="vehicle-capacity">Vehicle capacity (servings)</label>
+          <input id="vehicle-capacity" name="vehicle_capacity" type="number" min="1" max="1000" step="1" required>
+          <button id="run-button" class="button primary run-button" type="submit">Run planner <span aria-hidden="true">&rarr;</span></button>
+        </form>
+        <div class="objective-note"><span class="small-label">OPTIMIZATION ORDER</span><p><strong>01</strong> Cover as many servings as possible.</p><p><strong>02</strong> Minimize serving-km among those plans.</p><a href="#method" id="method-link">How the planner works &rarr;</a></div>
+        <div class="privacy-note">No maps API. No AI calls. No personal information needed. Runs entirely on your server.</div>
+      </aside>
+
+      <div class="workspace">
+        <nav class="tabs" aria-label="Planning views">
+          <button class="tab active" data-view="overview" type="button" aria-current="page">Plan overview</button>
+          <button class="tab" data-view="locations" type="button">Supply &amp; hubs <span id="location-count"></span></button>
+          <button class="tab" data-view="method" type="button">Method &amp; evidence</button>
+        </nav>
+        <div id="stale-warning" class="stale-warning" role="status" hidden>Inputs changed. The results below are the previous plan. Run the planner to update them.</div>
+
+        <section id="view-overview" class="view" aria-label="Plan overview">
+          <div id="metrics" class="metrics"></div>
+          <section class="panel map-panel">
+            <div class="section-heading"><div><p class="small-label">A NEIGHBORHOOD, CONNECTED</p><h2>Transfer network</h2></div><div class="map-legend"><span><i class="donor-dot"></i> Surplus</span><span><i class="hub-dot"></i> Hub</span></div></div>
+            <div id="network-map" class="network-map"></div>
+            <div class="map-footer"><span>Fictional coordinate grid / kilometers</span><span>Line weight = servings &middot; select a location to edit</span></div>
+          </section>
+          <div class="insights-grid">
+            <section class="panel"><div class="section-heading"><div><p class="small-label">WHO RECEIVES WHAT</p><h2>Hub coverage</h2></div></div><div id="hub-coverage"></div></section>
+            <section class="panel comparison-panel"><p class="small-label">A BETTER MATCH, NOT A BIGGER SUPPLY</p><h2>Compared with nearest-first</h2><div id="comparison"></div><p class="muted small">Same inputs and eligibility rules. Baseline assigns expiring batches to their nearest eligible hub first.</p></section>
+          </div>
+          <section class="panel">
+            <div class="section-heading"><div><p class="small-label">AN EXPLAINABLE HANDOFF</p><h2>Proposed transfers</h2></div><button class="button secondary" id="export-csv" type="button">Export plan CSV</button></div>
+            <div class="table-scroll"><table><thead><tr><th scope="col">From / food</th><th scope="col">Receiving hub</th><th scope="col">Servings</th><th scope="col">Direct km</th><th scope="col">Arrival</th><th scope="col">Loads</th></tr></thead><tbody id="transfers"></tbody></table></div>
+            <p class="muted small table-note">Each load is an independent direct trip. Vehicles are assumed available in parallel; this is not a driver schedule.</p>
+          </section>
+          <section class="panel"><div class="section-heading"><div><p class="small-label">MAKE THE GAPS VISIBLE</p><h2>Unassigned supply &amp; constraints</h2></div><span id="unassigned-label" class="small-tag"></span></div><div id="unassigned"></div></section>
+        </section>
+
+        <section id="view-locations" class="view" aria-label="Supply and hubs" hidden>
+          <div class="section-heading view-heading"><div><h2>The people behind the plan</h2><p class="muted">Use fictional names only. One donor record represents one food batch.</p></div><button id="export-json" class="button secondary" type="button">Export scenario JSON</button></div>
+          <div class="section-heading"><h3>Available surplus <span id="donor-count" class="small-tag"></span></h3><button id="add-donor" class="button primary" type="button">+ Add batch</button></div>
+          <div id="donor-list" class="location-grid"></div>
+          <div class="section-heading hub-list-heading"><h3>Receiving hubs <span id="hub-count" class="small-tag"></span></h3><button id="add-hub" class="button primary" type="button">+ Add hub</button></div>
+          <div id="hub-list" class="location-grid"></div>
+        </section>
+
+        <section id="view-method" class="view" aria-label="Method and evidence" hidden>
+          <article class="panel method-panel">
+            <p class="eyebrow">TRANSPARENT BY DESIGN</p><h2>Optimization you can inspect.</h2>
+            <p>CommonTable combines a constraint graph with an exact integer allocation algorithm. It does not use a language model or estimate real-world impact from synthetic data.</p>
+            <div class="method-steps">
+              <div><span>01</span><h3>Make eligible connections</h3><p>Check category, cold storage, distance, receiving capacity, expiry and opening windows. Travel minutes are rounded up; waiting for a hub to open is allowed.</p></div>
+              <div><span>02</span><h3>Find the maximum coverage</h3><p>A flow network connects source, batches, hubs and sink. Batch quantities bound supply; the smaller of hub demand and capacity bounds receipt.</p></div>
+              <div><span>03</span><h3>Use shorter connections</h3><p>Successive shortest augmenting paths with residual edges minimize distance per serving at maximum flow. Distances are rounded to the nearest meter for cost.</p></div>
+            </div>
+            <h3>Why not just choose the closest hub?</h3>
+            <p>In the included fixture, the bakery can serve two hubs but the breakfast club only accepts bakery food. Greedy matching uses up the flexible pantry first. Residual edges let the optimizer reconsider that choice, keeping scarce compatibility available.</p>
+            <div id="evidence-summary" class="evidence-summary"></div>
+            <h3>What the numbers mean</h3>
+            <dl class="definitions">
+              <dt>Servings</dt><dd>An abstract, interchangeable unit in this simulation. No nutrition, weight or meal-equivalence claim is made.</dd>
+              <dt>Serving-km</dt><dd>Allocated servings multiplied by direct-leg kilometers, summed over transfers. This is the minimized cost; it is not vehicle distance or emissions.</dd>
+              <dt>Loads / trip-km</dt><dd>Ceiling of servings divided by vehicle capacity for each transfer, and one-way distance summed over those loads. These are reported, not optimized. There are no return legs or multi-stop routes.</dd>
+              <dt>Coverage</dt><dd>Allocated servings divided by total declared demand. Aggregate coverage can favor some hubs; no fairness policy or minimum per-hub guarantee is imposed.</dd>
+            </dl>
+            <h3>Boundaries that matter</h3>
+            <p>Same-day windows only. One food category per batch; hub demand is a pooled number across accepted categories. Up to 20 batches and 20 hubs, with coordinates from 0 to 20 km. The planner assumes sufficient parallel vehicles, temperature-controlled transport where needed, and truthful declarations. It does not verify allergens, handling practices, road access or food safety.</p>
+            <p>Snapshots are isolated by an anonymous browser cookie, retained for seven days, and capped at 25 per browser and 1,000 per server. They are not user accounts or a secure place for sensitive information. Export JSON for portable, long-term copies.</p>
+          </article>
+          <section class="panel"><div class="section-heading"><div><p class="small-label">EVERY CONNECTION HAS A REASON</p><h2>Pair-by-pair eligibility</h2></div></div><div class="table-scroll"><table><thead><tr><th scope="col">Batch</th><th scope="col">Hub</th><th scope="col">Result</th></tr></thead><tbody id="pair-audit"></tbody></table></div></section>
+        </section>
+      </div>
+    </div>
+    <footer><span class="brand-footer">CommonTable</span><span>A working prototype for GIBC V2 &middot; Track 03: Open</span><span>Built for understanding. Not live dispatch.</span></footer>
+  </main>
+
+  <dialog id="editor-dialog" aria-labelledby="editor-title">
+    <div class="dialog-heading"><div><p class="small-label">SHAPE YOUR SCENARIO</p><h2 id="editor-title">Edit location</h2></div><button class="icon-button" type="button" data-close="editor-dialog" aria-label="Close editor">&times;</button></div>
+    <form id="editor-form"><div id="editor-fields"></div><div class="dialog-actions"><button class="button secondary" type="button" data-close="editor-dialog">Cancel</button><button class="button primary" type="submit">Apply changes</button></div></form>
+    <p id="editor-error" class="message error" role="alert" hidden></p>
+  </dialog>
+  <dialog id="snapshots-dialog" aria-labelledby="snapshots-title"><div class="dialog-heading"><div><p class="small-label">SAVED IN THIS BROWSER SESSION</p><h2 id="snapshots-title">Your snapshots</h2></div><button class="icon-button" type="button" data-close="snapshots-dialog" aria-label="Close snapshots">&times;</button></div><p class="muted small">Seven-day retention. Export JSON for a permanent copy. Clearing cookies removes access.</p><div id="snapshot-list"></div><p id="snapshot-error" class="message error" role="alert" hidden></p></dialog>
+  <noscript><div class="message error">JavaScript is required for the planning interface. The JSON API is also available; see the README.</div></noscript>
+</body>
+</html>

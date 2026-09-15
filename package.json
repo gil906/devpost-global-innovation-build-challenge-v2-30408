@@ -1,0 +1,16 @@
+{
+  "name": "commontable",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Explainable community food-surplus planning lab",
+  "type": "module",
+  "scripts": {
+    "build": "python3 scripts/build.py",
+    "test": "python3 -m unittest discover -s tests -v",
+    "test:browser": "node scripts/browser-check.mjs",
+    "demo": "node scripts/record-demo.mjs"
+  },
+  "devDependencies": {
+    "playwright": "1.58.2"
+  }
+}

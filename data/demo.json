@@ -1,0 +1,22 @@
+{
+  "name": "Tuesday neighborhood rescue",
+  "start_minute": 600,
+  "speed_kph": 18,
+  "handling_minutes": 10,
+  "max_leg_km": 5.5,
+  "vehicle_capacity": 30,
+  "donors": [
+    {"id":"bakery","name":"Sunrise bakery","x_km":2,"y_km":3,"quantity":60,"category":"bakery","ready_minute":600,"expires_minute":630},
+    {"id":"market","name":"Greenmarket surplus","x_km":1,"y_km":4,"quantity":70,"category":"produce","ready_minute":600,"expires_minute":660},
+    {"id":"grocer","name":"Northside grocer","x_km":6,"y_km":8,"quantity":40,"category":"chilled","ready_minute":600,"expires_minute":650},
+    {"id":"farm","name":"Urban farm collective","x_km":9,"y_km":7,"quantity":50,"category":"produce","ready_minute":600,"expires_minute":680},
+    {"id":"orchard","name":"Orchard co-op","x_km":8,"y_km":1,"quantity":30,"category":"produce","ready_minute":600,"expires_minute":700},
+    {"id":"deli","name":"Corner deli","x_km":1,"y_km":9,"quantity":20,"category":"chilled","ready_minute":600,"expires_minute":650}
+  ],
+  "hubs": [
+    {"id":"riverside","name":"Riverside pantry","x_km":3,"y_km":3,"demand":70,"capacity":70,"accepts":["produce","bakery","chilled"],"cold_storage":false,"open_minute":600,"close_minute":720},
+    {"id":"breakfast","name":"Eastside breakfast club","x_km":7,"y_km":3,"demand":60,"capacity":60,"accepts":["bakery"],"cold_storage":false,"open_minute":600,"close_minute":660},
+    {"id":"hilltop","name":"Hilltop community kitchen","x_km":7,"y_km":7,"demand":60,"capacity":60,"accepts":["produce","bakery","chilled"],"cold_storage":true,"open_minute":600,"close_minute":720},
+    {"id":"garden","name":"South garden hub","x_km":10,"y_km":4,"demand":40,"capacity":40,"accepts":["produce"],"cold_storage":false,"open_minute":600,"close_minute":720}
+  ]
+}
