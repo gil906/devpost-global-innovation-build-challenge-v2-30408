@@ -69,3 +69,9 @@ This is an **Open-track planning simulation**, not a medical or financial system
 ## Project materials
 
 The [README](README.md) contains setup, usage, schema, API, algorithm and reproduction instructions. The [media guide](docs/MEDIA.md) links the actual screenshots and local captioned recording. All application source, the original synthetic fixture and development scripts are included in this repository.
+
+
+## Try it out
+
+- [Live application](https://devpost-global-innovation-build-challenge-v2-30408.gilbertcv.com)
+- [Public source](https://github.com/gil906/devpost-global-innovation-build-challenge-v2-30408)

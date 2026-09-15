@@ -182,3 +182,9 @@ Python 3.11 (standard-library `http.server`, `sqlite3`, `heapq`, `math`, `csv`, 
 The data fixture, interface, illustrations and allocation implementation were created for this project. **No external dataset, pretrained model, hosted AI inference, maps service or paid API is used.** Code and the synthetic fixture are available under the [MIT license](LICENSE); development dependencies retain their respective licenses.
 
 **AI assistance:** GitHub Copilot CLI, powered by GPT-6 Astra, assisted project design, implementation, test authoring, documentation and demo automation. This is an AI-assisted software build, not an AI model submission. The application performs deterministic optimization and does not call Copilot or another model at runtime. Verification was performed on CPU-only ARM64 Linux with Python 3.11.16 and Node.js 22.23.2; no model was trained.
+
+
+## Try it out
+
+- [Live application](https://devpost-global-innovation-build-challenge-v2-30408.gilbertcv.com)
+- [Public source](https://github.com/gil906/devpost-global-innovation-build-challenge-v2-30408)
